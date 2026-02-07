@@ -19,14 +19,18 @@
 
     // Sync device selection both ways
     $effect(() => {
-        if (audioState.selectedDeviceId > 0) {
+        // Device ID 0 is valid on many systems (e.g. macOS built-in input).
+        if (audioState.selectedDeviceId >= 0) {
             selectedDeviceValue = audioState.selectedDeviceId.toString();
         }
     });
 
     // Trigger connect when user selects a device
     $effect(() => {
-        if (selectedDeviceValue && Number(selectedDeviceValue) !== audioState.selectedDeviceId) {
+        if (!selectedDeviceValue) return;
+        const selectedId = Number(selectedDeviceValue);
+        if (Number.isNaN(selectedId)) return;
+        if (selectedId !== audioState.selectedDeviceId || !audioState.isRunning) {
             handleConnect();
         }
     });
